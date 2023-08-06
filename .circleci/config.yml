@@ -163,6 +163,8 @@ jobs:
             # label for a new version for application
             envsubst < k8s/service.yaml | kubectl apply --filename -
 
+            echo " $(kubectl get pod)"
+
   remove-old-blue:
     docker:
       - image: cimg/python:3.7.13
@@ -178,6 +180,7 @@ jobs:
       - run:
           name: Remove the old version flask-app
           command: |
+            echo " $(kubectl get pod)"
             export VERSION=$(<app/version.txt)
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
