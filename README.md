@@ -1,14 +1,14 @@
+[![CircleCI](https://circleci.com/gh/long161711/capstoneProject.svg?style=svg)](https://circleci.com/gh/long161711/capstoneProject)
 # udacity_devops_capstone
-#GET_PASSES_THIS_REPO_UDACITY_PLEASE
-
-
 
 #######
+Categories:
+1. Set Up Pipeline
+2. Build Docker Container
+3. Deployment
+
 This app use:
-1. EKS deploy by aws cli: CF attached in infra/cluster.yml
-2. Using Blue-green option
-  with: Green v1
-        Blue v2
-3. Images save in docker hub
-4. Try to make a approve sample for this
-5. Using personal acc because it related some issue with create eks
+1. Use Jenkins or Circle CI, and implement blue/green or rolling deployment.
+2. Pick AWS Kubernetes as a Service, or build your own Kubernetes cluster.
+3. Build my pipeline on circleci
+4. Test my pipeline.
