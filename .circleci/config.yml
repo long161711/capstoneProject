@@ -133,6 +133,11 @@ jobs:
               --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
             echo "LOAD_BALANCER: $LOAD_BALANCER"
 
+            echo
+            echo " $(kubectl get pod)"
+            echo
+            echo " $(kubectl get service)"
+
   wait-manual-approval:
     docker:
       - image: cimg/node:13.8.0
@@ -162,8 +167,12 @@ jobs:
 
             # label for a new version for application
             envsubst < k8s/service.yaml | kubectl apply --filename -
-
+            
+            echo
             echo " $(kubectl get pod)"
+            echo
+            echo " $(kubectl get service)"
+
 
   remove-old-blue:
     docker:
@@ -177,10 +186,14 @@ jobs:
           name: Connect to cluster
           command: |
             aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $CLUSTER_NAME
+            echo
+            echo " $(kubectl get pod)"
+            echo
+            echo " $(kubectl get service)"
       - run:
           name: Remove the old version flask-app
           command: |
-            echo " $(kubectl get pod)"
+            
             export VERSION=$(<app/version.txt)
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
