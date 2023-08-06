@@ -42,24 +42,30 @@ jobs:
     docker:
       - image: cimg/python:3.7.13
     steps:
+      #check out source code from git repository
       - checkout
-      # Download and cache dependencies
+      
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "app/requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
+
             - v1-dependencies-
       - run:
           name: Install dependencies
           command: |
+            # install dependencies for enviroment
             chmod -R +x ./bin/
             python3 -m venv .devops-capstone
             source .devops-capstone/bin/activate
+
+
+            # install dependencies
             make install
       - save_cache:
           paths:
             - ./.devops-capstone
           key: v1-dependencies-{{ checksum "app/requirements.txt" }}
+      
       - run:
           name: Run lint
           command: |
@@ -78,19 +84,17 @@ jobs:
           command: |
             export VERSION=$(<app/version.txt)
             
-            # Build docker image
+            # Build docker image to make it to container
             docker build -t flask-app app
             
-            # Tag image
+            # Create tag and taged it to docker omage
             docker tag flask-app ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:${VERSION}
             docker tag flask-app ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:lastest
             
-            # Login to docker-hub
+            # Login docker hub with enviroment variable docker login and docker password
             docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
             
-            # We publish two images with different version tags: 
-            # - numbered version
-            # - "latest"
+            # Push docker container to docker hub docker repository
             docker push ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:${VERSION}
             docker push ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:lastest
 
@@ -109,6 +113,7 @@ jobs:
       - run:
           name: Deploy new version as green
           command: |
+
             export VERSION=$(<app/version.txt)
             export DOCKER_IMAGE=${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:${VERSION}
             export LABEL_VERSION=${VERSION/./-}
@@ -118,9 +123,10 @@ jobs:
             
             envsubst < k8s/deployment.yaml | kubectl apply --filename -
             
-            # service-green.yaml creates the flask-app-green service
+
             envsubst < k8s/service-green.yaml | kubectl apply --filename -
 
+            # wait to create load balancer to make service
             sleep 3
             LOAD_BALANCER=$(kubectl get services \
               flask-app-green \
@@ -131,7 +137,7 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
-      - run: echo "A hold job to wait for a manual approval"
+      - run: echo "A hold job to wait for a manual approval to ensure on purpose"
 
   deploy-new-blue:
     docker:
@@ -148,10 +154,13 @@ jobs:
       - run:
           name: Target new version — new blue
           command: |
+          
             export VERSION=$(<app/version.txt)
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
-            # flask-app service target now labeled new version
+
+
+            # label for a new version for application
             envsubst < k8s/service.yaml | kubectl apply --filename -
 
   remove-old-blue:
@@ -173,7 +182,7 @@ jobs:
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
             
-            # Remove the flask-app-x-x deployment
+
             for deploy in $(kubectl get deployments -o jsonpath="{.items[*].metadata.name}" | grep flask-app);
             do
               if [[ $deploy != flask-app-$LABEL_VERSION ]];
@@ -182,7 +191,7 @@ jobs:
               fi
             done
             
-            # Remove the flask-app-green service
+
             if kubectl get services | grep flask-app-green;
             then
               kubectl delete services flask-app-green
@@ -192,14 +201,19 @@ workflows:
   default:
     jobs:
       - run-lint
+
       - build-and-push-docker-image:
           requires: [run-lint]
+
       - deploy-green:
           requires: [build-and-push-docker-image]
+
       - wait-manual-approval:
           type: approval
           requires: [deploy-green]
+      
       - deploy-new-blue:
           requires: [wait-manual-approval]
+      
       - remove-old-blue:
           requires: [deploy-new-blue]

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: flask-app-green # name modified
+  name: flask-app-green
 spec:
   ports:
   - port: 80
