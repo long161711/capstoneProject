@@ -12,3 +12,17 @@ This app use:
 2. Pick AWS Kubernetes as a Service, or build your own Kubernetes cluster.
 3. Build my pipeline on circleci
 4. Test my pipeline.
+
+How the cluster is deployed:
+1. Create cluster with eksctl in command line and connect it to AWS account with command line "eksctl create cluster --config-file=./infra/cluster.yml"
+2. It will make cluster in AWS and three Stacks in Cloud formation
+    2.1.1 eksctl-k8s-demo-cluster
+    2.1.2 eksctl-k8s-demo-addon-iamserviceaccount-kube-system-aws-node
+    2.1.3 eksctl-k8s-demo-nodegroup-capstone-app
+3. Create web application and circle ci file (config.yml)
+4. In config.yml I create  deployment and deploy into cluster in AWS
+    4.1.1 kubectl apply --filename by apply file with name k8s/deployment.yaml that i have configure: This command uses envsubst to perform environment variable  substitution on the k8s/deployment.yaml file and then applies the updated configuration to the Kubernetes cluster using kubectl apply.
+    4.1.2 k8s/service-green.yaml | kubectl apply --filename -: Similar to the first command, this line uses envsubst to replace environment variables in the k8s/service-green.yaml file and applies the updated configuration using kubectl apply.
+    4.1.3 LOAD_BALANCER=$(kubectl get services flask-app-green --output jsonpath='{.status.loadBalancer.ingress[0].hostname}'): This line retrieves the hostname of the load balancer associated with the service named "flask-app-green" using kubectl get services. The result is stored in the variable LOAD_BALANCER.
+    4.1.4 kubectl delete services flask-app-green: If the service "flask-app-green" exists (as determined by the previous command), this line deletes the service using kubectl delete services.
+    4.1.5 kubectl delete deployments $deploy: If the condition in the previous line is true, this command deletes the deployment with the name stored in the deploy variable using kubectl delete deployments.

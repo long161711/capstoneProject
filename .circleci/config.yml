@@ -136,7 +136,7 @@ jobs:
             echo
             echo " $(kubectl get pod)"
             echo
-            echo " $(kubectl get service)"
+            echo " $(kubectl get services)"
 
   wait-manual-approval:
     docker:
@@ -167,11 +167,11 @@ jobs:
 
             # label for a new version for application
             envsubst < k8s/service.yaml | kubectl apply --filename -
-            
+
             echo
             echo " $(kubectl get pod)"
             echo
-            echo " $(kubectl get service)"
+            echo " $(kubectl get services)"
 
 
   remove-old-blue:
@@ -189,7 +189,7 @@ jobs:
             echo
             echo " $(kubectl get pod)"
             echo
-            echo " $(kubectl get service)"
+            echo " $(kubectl get services)"
       - run:
           name: Remove the old version flask-app
           command: |
