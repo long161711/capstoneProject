@@ -79,11 +79,11 @@ jobs:
             export VERSION=$(<app/version.txt)
             
             # Build docker image
-            docker build -t flask-app app
+            docker build -t udacity-capstone-project app
             
             # Tag image
-            docker tag flask-app ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:${VERSION}
-            docker tag flask-app ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:lastest
+            docker tag udacity-capstone-project ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:${VERSION}
+            docker tag udacity-capstone-project ${DOCKER_HUB_ID}/${DOCKER_REPOSITORY}:lastest
             
             # Login to docker-hub
             docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
@@ -118,12 +118,12 @@ jobs:
             
             envsubst < k8s/deployment.yaml | kubectl apply --filename -
             
-            # service-green.yaml creates the flask-app-green service
+            # service-green.yaml creates the udacity-capstone-project-green service
             envsubst < k8s/service-green.yaml | kubectl apply --filename -
 
             sleep 3
             LOAD_BALANCER=$(kubectl get services \
-              flask-app-green \
+              udacity-capstone-project-green \
               --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
             echo "LOAD_BALANCER: $LOAD_BALANCER"
 
@@ -151,7 +151,7 @@ jobs:
             export VERSION=$(<app/version.txt)
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
-            # flask-app service target now labeled new version
+            # udacity-capstone-project service target now labeled new version
             envsubst < k8s/service.yaml | kubectl apply --filename -
 
   remove-old-blue:
@@ -167,25 +167,25 @@ jobs:
           command: |
             aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $CLUSTER_NAME
       - run:
-          name: Remove the old version flask-app
+          name: Remove the old version udacity-capstone-project
           command: |
             export VERSION=$(<app/version.txt)
             export LABEL_VERSION=${VERSION/./-}
             echo "LABEL_VERSION: $LABEL_VERSION"
             
-            # Remove the flask-app-x-x deployment
-            for deploy in $(kubectl get deployments -o jsonpath="{.items[*].metadata.name}" | grep flask-app);
+            # Remove the udacity-capstone-project-x-x deployment
+            for deploy in $(kubectl get deployments -o jsonpath="{.items[*].metadata.name}" | grep udacity-capstone-project);
             do
-              if [[ $deploy != flask-app-$LABEL_VERSION ]];
+              if [[ $deploy != udacity-capstone-project-$LABEL_VERSION ]];
               then
                 kubectl delete deployments $deploy
               fi
             done
             
-            # Remove the flask-app-green service
-            if kubectl get services | grep flask-app-green;
+            # Remove the udacity-capstone-project-green service
+            if kubectl get services | grep udacity-capstone-project-green;
             then
-              kubectl delete services flask-app-green
+              kubectl delete services udacity-capstone-project-green
             fi
 
 workflows:

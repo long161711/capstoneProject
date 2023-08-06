@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flask-app-${LABEL_VERSION}
+  name: udacity-capstone-project-${LABEL_VERSION}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: flask-app
+      app: udacity-capstone-project
       version: ${LABEL_VERSION}
   template:
     metadata:
       labels:
-        app: flask-app
+        app: udacity-capstone-project
         version: ${LABEL_VERSION}
     spec:
       containers:
-      - name: flask-app
+      - name: udacity-capstone-project
         image: ${DOCKER_IMAGE}
         ports:
         - containerPort: 80
