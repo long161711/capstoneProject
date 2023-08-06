@@ -5,10 +5,10 @@ LABEL author="long161711@gmail.com"
 # Working Directory
 WORKDIR /app
 
-# Copy source code to working directory
+# Copy source code to working directory to build
 COPY . /app/
 
-# Install packages from requirements.txt
+# Install all packages from version in  requirements.txt
 # hadolint ignore=DL3013
 RUN pip install  --no-cache-dir --upgrade pip && \
     pip install  --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
