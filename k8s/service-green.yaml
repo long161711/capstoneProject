@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: udacity-capstone-project-green 
+  name: flask-app-green # name modified
 spec:
   ports:
   - port: 80
@@ -9,6 +9,6 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: udacity-capstone-project
+    app: flask-app
     version: ${LABEL_VERSION}
   type: LoadBalancer

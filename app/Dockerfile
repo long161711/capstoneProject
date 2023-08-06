@@ -1,21 +1,20 @@
-# Dockerfile for Python 3.7.3 with Stretch base image
+FROM python:3.7.3-stretch
 
-# Set the author's email address
 LABEL author="long161711@gmail.com"
 
-# Set the working directory inside the container
+# Working Directory
 WORKDIR /app
 
-# Copy the source code to the working directory
+# Copy source code to working directory
 COPY . /app/
 
 # Install packages from requirements.txt
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
+RUN pip install  --no-cache-dir --upgrade pip && \
+    pip install  --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
 
-# Expose port 80 to allow incoming connections
+# Expose port 80
 EXPOSE 80
 
-# Command to run the app when the container is launched
+# Run app at container launch
 CMD ["python", "app.py"]

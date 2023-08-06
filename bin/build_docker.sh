@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-# Build image for deploy
+# Build capstone-app image
 docker build -t capstone-app app
